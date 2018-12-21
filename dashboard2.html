@@ -1,0 +1,155 @@
+<!DOCTYPE <!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Page Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" media="screen" href="css/style.css" />
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+        crossorigin="anonymous">
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+
+
+    <style type="text/css">
+        body {
+            background: #ededed !important;
+        }
+
+        /* Adding !important forces the browser to overwrite the default style applied by Bootstrap */
+
+        /*#vertBar {
+
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    height: 500px;
+    width: 500px;
+
+    }
+
+    #lines {
+
+    position: absolute;
+    top: 10px;
+    left: 510;
+    height: 500px;
+    width: 500px;
+
+
+
+    }
+
+    #popGroups {
+
+    position: absolute;
+    top: 510px;
+    left: 10px;
+    height: 500px;
+    width: 500px;
+
+
+    }
+
+    #pyramid {
+
+    position: absolute;
+    top: 510px;
+    left: 510px;
+    height: 500px;
+    width: 500px;
+
+
+    }*/
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+            <a class="navbar-brand" href="#">Charts | بيانيات</a>
+        </nav>
+
+        <div class="row m-2 bg-white">
+            <div class="col ">
+                <h1 class="display-4">Abu Dhabi Population</h1>
+                <p class="lead">Abu Dhabi population from 1975 to 2015</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="card m-2">
+                    <div class="card-header">
+                        Chart
+                    </div>
+
+                    <div id='vertBar' class="align-items-center"></div>
+
+                    <div class="card-footer text-muted">last updated: 2 days ago</div>
+                </div>
+
+            </div>
+
+            <div class="col">
+                <div class="card m-2">
+                    <div class="card-header">
+                        Chart
+                    </div>
+                    <div id='lines'></div>
+                    <div class="card-footer text-muted">last updated: 2 days ago</div>
+
+                </div>
+
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col">
+                <div class="card m-2">
+                    <div class="card-header">
+                        Chart
+                    </div>
+                    <div id='popGroups'></div>
+                    <div class="card-footer text-muted">last updated: 2 days ago</div>
+
+                </div>
+
+            </div>
+
+            <div class="col">
+                <div class="card m-2">
+                    <div class="card-header">
+                        Chart
+                    </div>
+                    <div id='pyramid'></div>
+                    <div class="card-footer text-muted">last updated: 2 days ago</div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+
+
+    <script src="js/vert_bar.js"></script>
+    <script src="js/pop_groups.js"></script>
+    <script src="js/pyramid.js"></script>
+    <script src="js/ms_line.js"></script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Page Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    
+</head>
+<body>
+<svg></svg>
+
+<script>
+    
+    xc=[1975,1980,1985,1990,1995,2000,2005]
+    var margin = 60,
+        width = 600 - 2*margin
+        height= 600 - 2*margin;
+
+
+    const svg = d3.select("svg")
+    .attr('height',600)
+    .attr('width',600)
+
+
+    const chart = svg.append('g')             
+    .attr('transform','translate(60,60)')
+
+ 
+     const yScale= d3.scaleLinear()
+    .domain([0,5])
+    .range([height,0])
+
+    const xScale=d3.scaleBand()
+    .domain([1975,1980,1985,1990,1995,2000,2005])
+    .range([0,width])
+    .padding(0.2)
+
+   chart.append('g')
+    .call(d3.axisLeft(yScale));
+
+chart.append(`g`)
+.attr(`transform`,`translate(0,${height})`)
+.call(d3.axisBottom(xScale));
+
+    data=[1,2,3,4,5]
+
+    var bars=chart.selectAll()
+    .data(data)
+    .enter()
+    .append('rect')
+    .attr('x',(d,i) => xScale(xc[i]))
+    .attr('y',(d) => yScale(d))
+    .attr('width',(d) => xScale.bandwidth())
+    .attr('height',(d,i) => height-yScale(d))
+
+
+bars.on('mouseenter', function (actual, i) {
+        d3.select(this)
+          .attr('opacity', 0)})
+
+
+
+
+
+chart.append('g')
+.attr('class','grid')
+.call(d3.axisLeft()
+        .scale(yScale)
+        .tickSize(-width,0,0)
+        .tickFormat(''))
+
+
+
+chart.append('text')
+.attr('x',-(height)/2)
+.attr('y',-30)
+.attr('transform','rotate(-90)')
+.attr('text-anchor','middle')
+.text('Population')
+
+
+
+svg.append('text')
+    .attr('x', width / 2 + margin)
+    .attr('y', 40)
+    .attr('text-anchor', 'middle')
+    .text('UAE Population')
+
+
+chart.selectAll()
+.data(data)
+.enter()
+.append('rect')
+.on('mouseenter', function (actual, i) {
+        chart.selectAll('rect')
+          .attr('opacity', 0)})
+
+
+
+    </script>
+
+</body>
+</html>

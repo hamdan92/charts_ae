@@ -1,0 +1,276 @@
+<!DOCTYPE <!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Page Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+    <style type='text/css'>
+        .labels path,
+        .labels line {
+            fill: none;
+            stroke: none;
+        }
+
+        .local , .local rect{
+            fill: cornflowerblue;
+            font-size: 0.8em;
+        }
+
+        .nlocal , .nlocal rect{
+            fill: grey;
+            font-size: 0.8em;
+        }
+    </style>
+
+</head>
+
+<body>
+
+
+
+    <script>
+
+        d3.csv("data/ad_pop_total.csv").then(function (data) {
+
+
+            var dataTotal = data;
+            var dataLocal;
+            var dataNLocal;
+
+            dataset = { 'year': [], 'population': [] };
+            for (i = 0; i < data.length; i++) {
+                dataset['year'].push(data[i].year)
+                dataset['population'].push(data[i].population)
+
+
+
+            }
+            d3.csv("data/ad_local_pop.csv").then(function (data1) {
+                dataLocal = data1;
+
+                d3.csv("data/ad_nlocal_pop.csv").then(function (data2) {
+                    dataNLocal = data2;
+
+                    drawLineChart(data, dataNLocal, dataLocal, dataset)
+
+
+
+                });
+
+
+            });
+
+
+
+
+
+        });
+
+        function drawLineChart(data, dataNLocal, dataLocal, dataset) {
+
+
+            var margin = { top: 40, down: 125, right: 50, left: 50 }
+                , width = (700) - margin.left - margin.right
+                , height = (600) - margin.top - margin.down
+                , chartC = { x0: 200, x1: width, y0: 30, y1: height }
+                , percentageFormatter = d3.format(',.1%');
+
+            // the number of data points
+
+
+
+
+            var svg = d3.select('body').append('svg')
+                .attr('width', width + margin.left + margin.right)
+                .attr('height', height + margin.top + margin.down)
+                .append('g')
+                .attr('transform', `translate(${margin.left},${margin.top})`)
+
+
+            svg.append('g').append('text')
+                .attr('transform', d => `translate(${-10},${-10})`)
+                .text('Local Percentage of Total Abu Dhabi Population')
+
+
+
+            var chart = svg.append('g')
+                .attr('transform', `translate(${chartC.x0},${chartC.y0})`)
+
+
+            var chartTitle=chart.append('text')
+            .attr('transform', `translate(${10},${-10})`)
+            .style('font-size','0.8em')
+            .attr('class','lead')
+            .html(`Normalized Population Index |<tspan style="fill:cornflowerblue"> Local Percentage</tspan> `)
+
+
+
+
+
+
+            var yScale_0 = d3.scaleBand()
+                .domain(dataset.year)
+                .range([chartC.y1-chartC.y0-margin.top, 0])
+                .paddingInner(0.2)
+
+            var yScale_1 = d3.scaleBand()
+                .domain(['L', 'NL'])
+                .range([yScale_0.bandwidth(), 0]);
+
+
+
+            var xScales = [];
+
+            for (i = 0; i < dataNLocal.length; i++) {
+
+                x = d3.scaleLinear()
+                    .domain([0, parseInt(dataNLocal[i].population) + parseInt(dataLocal[i].population)])
+                    .range([0, width-margin.left-chartC.x0]);
+
+                console.log(x(dataNLocal[i].population));
+                console.log(x.range());
+
+
+                xScales.push(x);
+
+            }
+
+            console.log(yScale_1('L'));
+
+
+            chart.append('g')
+                .attr('class', 'axis labels')
+                //.attr('transform', `translate(${0},${0})`)
+                .call(d3.axisLeft(yScale_0))
+
+
+            var o = chart.append('g')
+                .selectAll('g')
+                .data(dataNLocal)
+                .enter()
+                .append('g')
+                .attr('transform', d => `translate(${0},${yScale_0(d.year)})`);
+
+
+
+            o.append('rect')
+                .attr('class', 'nlocal')
+                .attr('x', 10)
+                .attr('y', yScale_1('L'))
+                .attr('height', 15)
+                .attr('width', (d, i) => xScales[i](parseInt(dataNLocal[i].population)))
+
+
+            o.append('rect')
+                .attr('class', 'local')
+                .attr('x', 10)
+                .attr('y', yScale_1('NL'))
+                .attr('height', 15)
+                .attr('width', (d, i) => xScales[i](parseInt(dataLocal[i].population)))
+
+
+            o.append('text')
+                .attr('class', 'local')
+                .attr('x', (d, i) => xScales[i](parseInt(dataLocal[i].population)) + 15)
+                .attr('y', yScale_1('L') - 5)
+                .style("font-size", "90px;")
+                .text((d, i) => percentageFormatter(parseInt(dataLocal[i].population) / (parseInt(dataLocal[i].population) + parseInt(dataNLocal[i].population))))
+
+
+
+
+            var legend = svg.append('g')
+                            .attr('transform',`translate(10,30)`);
+            
+            legend.append('g')
+            .attr('transform',`translate(0,0)`)
+            .append('rect')
+            .attr('class','local')
+            .attr('width',10)
+            .attr('height',10);
+
+            legend.append('g')
+            .attr('transform',`translate(14,9)`)
+            .append('text')
+            .attr('class','local')
+            .text('Local')
+
+
+            legend.append('g')
+            .attr('transform',`translate(0,15)`)
+            .append('rect')
+            .attr('class','nlocal')
+            .attr('width',10)
+            .attr('height',10);
+
+            legend.append('g')
+            .attr('transform',`translate(14,24)`)
+            .append('text')
+            .attr('class','nlocal')
+            .text('Foreign')
+            
+            
+
+
+
+            /*
+            
+                        var xScale = d3.scaleLinear()
+                            .domain([data[0].year, data[data.length - 1].year])
+                            .range([chartC.x0, chartC.x1]);
+            
+                        var yScale = d3.scaleLinear()
+                            .domain([0, 3000000])
+                            .range([chartC.y1, chartC.y0]);
+            
+                        chart.append('g')
+                            .attr('class', 'x axis axis--grid')
+                            .attr('transform', `translate(0,${height + 105})`)
+                            .call(d3.axisBottom(xScale)
+                                .tickValues(dataset.year)
+                                .tickFormat(d3.format(""))
+                                .tickSize(-30));
+            
+                        var brush = d3.brushX()
+                            .extent([[0, height + 75], [width, height + 105]])
+            
+                        var bObj = svg.append("g")
+                            .attr("class", "brush");
+            
+            
+                        bObj.call(brush)
+                            .call(brush.move, xScale.range());
+            
+            
+                        brush.on("end", brushed);
+            
+            
+                        function brushed() {
+            
+            
+            
+                            var startYear = xScale.invert(d3.event.selection[0]);
+                            var endYear = xScale.invert(d3.event.selection[1]);
+            
+            
+                            startYear = 1975 + (Math.round(((startYear - 1975) / 5)) * 5)
+                            endYear = 1975 + (Math.round(((endYear - 1975) / 5)) * 5)
+            
+                            if (d3.event.sourceEvent.type == 'mouseup') bObj.call(brush.move, [xScale(startYear), xScale(endYear)]);
+            
+            
+            
+                        }
+                        */
+
+
+        }
+    </script>
+</body>
+
+</html>

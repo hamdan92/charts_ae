@@ -1,0 +1,307 @@
+<!DOCTYPE <!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Page Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <style type='text/css'>
+        .male {
+
+            fill: #3388EE;
+
+
+        }
+
+        .female {
+            fill: #EEAACC;
+        }
+    </style>
+
+</head>
+
+<body>
+
+
+    <script>
+        var margin = 10
+            , width = 960 - 2 * margin
+            , height = 500 - 2 * margin
+            , gutter = 30
+            , pyramid_h = height - 105
+            , cx = width / 2
+            , formatter = d3.format(',d');
+
+
+
+        var svg = d3.select('body').append('svg')
+            .attr('width', width + 2 * margin)
+            .attr('height', height + 2 * margin)
+            .append('g')
+            .attr('transform', `translate(${margin},${margin})`);
+
+        var svg_text_m = svg.append('text')
+            .attr('transform', `translate(${cx + 200},${10})`)
+            .style('font', '15px sans-serif')
+            .attr('text-anchor', 'start')
+        //.text('Males')
+
+        var svg_text_f = svg.append('text')
+            .attr('transform', `translate(${cx - 200},${10})`)
+            .style('font', '15px sans-serif')
+            .attr('text-anchor', 'end');
+
+        var svg_text_t = svg.append('text')
+            .attr('transform', `translate(${cx},${pyramid_h + 55})`)
+            .style('font', '15px sans-serif')
+            .attr('text-anchor', 'middle');
+
+
+
+        //function uptext
+
+        // year axis
+        /*
+        var s_year = d3.scaleLinear()
+            .domain([1995, 2010])
+            .range([0, 400])
+            .clamp('true');
+
+        var ax_year = d3.axisBottom(s_year)
+            .ticks(8)
+            .tickFormat(String);
+
+        var svg_axis_year = svg.append('g')
+            .attr('class', 'x axis')
+            .attr('transform', `translate(${cx - 200},${pyramid_h + 85})`)
+            .call(ax_year);
+
+*/
+        // age axis
+        var s_age = d3.scaleBand()
+            .domain(['0-4', '5-9', '10-14', '15-19', '20-24', '25-29', '30-34', '35-39', '40-44', '45-49', '50-54', '55-59', '60-64', '65-69', '70-74', '75-79', '80+'])
+            .range([pyramid_h, 0]);
+
+        var ax_ageـl = d3.axisLeft(s_age)
+            //.ticks(15)
+            .tickFormat(String)
+
+
+
+        var ax_age_svg_l = svg.append('g')
+            .attr('class', 'axis age')
+            .attr('transform', `translate(${cx - gutter / 2 + 25},0)`)
+            .call(ax_ageـl)
+            .selectAll('text')
+            .attr('x', -gutter / 2 - 10)
+            .style('text-anchor', 'middle');
+
+        var ax_age_r = d3.axisRight(s_age)
+            //.ticks(15)
+            .tickFormat(d => '');
+
+
+
+        var ax_age_svg_r = svg.append('g')
+            .attr('class', 'axis age')
+            .attr('transform', `translate(${cx - gutter / 2 - 25},0)`)
+            .call(ax_age_r);
+
+
+        // population scale 
+        var s_male = d3.scaleLinear()
+            .domain([0, 45000])
+            .range([0, 250]);
+
+        var s_female = d3.scaleLinear()
+            .domain([45000, 0])
+            .range([0, 250]);
+
+
+        var ax_male = d3.axisBottom(s_male)
+            .ticks(5)
+            .tickFormat(formatter);
+
+        var ax_female = d3.axisBottom(s_female)
+            .ticks(5)
+            .tickFormat(formatter);
+
+        svg.append('g')
+            .attr('class', 'axis')
+            .attr('transform', `translate(${cx + gutter},${pyramid_h + 5})`)
+            .call(ax_male)
+
+        svg.append('g')
+            .attr('class', 'axis population')
+            .attr('transform', `translate(${cx - gutter - 25 - 250},${pyramid_h + 5})`)
+            .call(ax_female);
+
+
+        d3.csv("pop_pyramid.csv")
+            .then(function (data) {
+
+                //male_values=data[0].slice(1,data[0].length);
+                //console.log(data.columns.slice(1,data.columns.length));
+                //data.columns.slice(1,18)
+                var keys = data.columns.slice(1, data.columns.length);
+                var male_values = [];
+                var female_values = [];
+                for (i = 0; i < keys.length; i++) {
+                    male_values.push(data[0][keys[i]]);
+                    female_values.push(data[1][keys[i]]);
+                }
+
+
+                var maleSum = male_values.reduce((a, b) => parseInt(a) + parseInt(b), 0);
+                var femaleSum = female_values.reduce((a, b) => parseInt(a) + parseInt(b), 0)
+
+
+
+
+
+                lineHeight = 1 * 2,
+                    textY = svg_text_m.attr("y"),
+                    textDy = parseFloat(svg_text_m.attr("dy"));
+
+                svg_text_m.text(null)
+                    .append('tspan').attr('x', 0).attr('y', textY).attr('dy', 0.71 + 'em').text('Males')
+                    .append('tspan').attr('x', 0).attr('y', textY).attr('dy', 1 + 'em').text(formatter(maleSum))
+
+                svg_text_f.text(null)
+                    .append('tspan').attr('x', 0).attr('y', textY).attr('dy', 0.71 + 'em').text('Females')
+                    .append('tspan').attr('x', 0).attr('y', textY).attr('dy', 1 + 'em').text(formatter(femaleSum))
+
+
+                svg_text_t.text("Total local population in 2016 : " + formatter(maleSum + femaleSum))
+
+
+
+
+
+
+
+                //console.log(male_values);
+                var male_bars = svg.append('g').selectAll('rect')
+                    .data(male_values)
+                    .enter()
+                    .append('rect')
+                    .attr('class', 'male')
+                    .attr('width', d => s_male(parseInt(d)))
+                    .attr('height', 20)
+                    .attr('x', cx + gutter)
+                    .attr('y', (d, i) => s_age(keys[i]))
+                //.on('mouseover', (d, i) => handleMouseOver(d, i))
+                //.on('mouseout', (d, i) => handleMouseOut(d, i))
+
+
+                var female_bars = svg.append('g').selectAll('rect')
+                    .data(female_values)
+                    .enter()
+                    .append('rect')
+                    .attr('class', 'female')
+                    .attr('width', d => s_female(0) - s_female(parseInt(d)))
+                    .attr('height', 20)
+                    .attr('x', d => cx - gutter - 25 - (s_female(0) - s_female(parseInt(d))))
+                    .attr('y', (d, i) => s_age(keys[i]))
+                // .on('mouseover', (d, i) => handleMouseOver(d, i))
+                // .on('mouseout', (d, i) => handleMouseOut(d, i))
+
+                    svg.append('g').selectAll('rect')
+                    .data(male_values)
+                    .enter()
+                    .append('rect')
+                    .attr('width', width)
+                    .attr('height', 20)
+                    .attr('x', 0)
+                    .attr('y', (d, i) => s_age(keys[i]))
+                    .style('opacity','0')
+                    .on('mouseover', (d, i) => handleMouseOver(d, i))
+                    .on('mouseout', (d, i) => handleMouseOut(d, i))
+
+
+
+                male_texts = svg.append('g').selectAll('rect')
+                    .data(male_values)
+                    .enter()
+                    .append('text')
+                    .attr('x', d => cx + gutter + s_male(parseInt(d)) + 20)
+                    .attr('y', (d, i) => s_age(keys[i]) + 15)
+                    .style('display', 'none');
+
+
+                female_texts = svg.append('g').selectAll('rect')
+                    .data(female_values)
+                    .enter()
+                    .append('text')
+                    .attr('x', d => cx - gutter - 25 - (s_female(0) - s_female(parseInt(d))) - 50)
+                    .attr('y', (d, i) => s_age(keys[i]) + 15)
+                    .style('display', 'none');
+
+
+
+
+
+
+
+                function handleMouseOver(d, i) {
+
+
+                    maleBar = d3.select(male_bars.selectAll('rect')._parents[i]).style('fill', 'orangered');
+                    femaleBar = d3.select(female_bars.selectAll('rect')._parents[i]).style('fill', 'orangered');
+                    maleText = d3.select(male_texts.selectAll('text')._parents[i]).text(maleBar._groups[0][0].__data__).style('display', 'inline');
+                    femaleText = d3.select(female_texts.selectAll('text')._parents[i]).text(femaleBar._groups[0][0].__data__).style('display', 'inline');
+
+                }
+
+                function handleMouseOut(d, i) {
+
+                    maleBar = d3.select(male_bars.selectAll('rect')._parents[i]).style('fill', '#3388EE');
+                    femaleBar = d3.select(female_bars.selectAll('rect')._parents[i]).style('fill', '#EEAACC');
+                    maleText = d3.select(male_texts.selectAll('text')._parents[i]).text(maleBar._groups[0][0].__data__).style('display', 'none');
+                    femaleText = d3.select(female_texts.selectAll('text')._parents[i]).text(femaleBar._groups[0][0].__data__).style('display', 'none');
+
+
+                    
+
+
+                }
+
+
+
+
+
+
+
+
+
+            });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </script>
+</body>
+
+</html>

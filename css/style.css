@@ -1,0 +1,57 @@
+.male {
+
+    fill: #3388EE;
+
+
+}
+
+.female {
+    fill: #EEAACC;
+}
+
+
+        .lineTotal {
+            fill: none;
+            stroke: #ffab00;
+            stroke-width: 6;
+        }
+
+        .lineNLocal {
+            fill: none;
+            stroke: orangered;
+            stroke-width: 3;
+        }
+
+        .lineLocal {
+            fill: none;
+            stroke: green;
+            stroke-width: 3;
+        }
+
+        .dot {
+            fill: #ffab00;
+            stroke: #fff;
+        }
+
+        .focus circle {
+            fill: none;
+            stroke: steelblue;
+
+            
+        }
+
+        .labels path,
+        .labels line {
+            fill: none;
+            stroke: none;
+        }
+
+        .local , .local rect{
+            fill: cornflowerblue;
+            font-size: 0.8em;
+        }
+
+        .nlocal , .nlocal rect{
+            fill: grey;
+            font-size: 0.8em;
+        }
