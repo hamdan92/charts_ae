@@ -9,6 +9,13 @@ var parentWidth = d3.select(parentDiv).node().getBoundingClientRect().width;
 var height = 0;
 var width = 0
 
+var minWidth=400;
+
+if(parentWidth <minWidth) {
+    parentWidth= minWidth
+}
+
+
 if (0.75 * parentWidth > 0.75 * maxHeight) {
     height = 0.75 * maxHeight;
     width = 1.34 * height;
