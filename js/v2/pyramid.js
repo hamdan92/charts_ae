@@ -10,6 +10,12 @@ function drawPyramid(data, labels, colors, classes, container) {
     var keys = data.columns.slice(1, data.columns.length);
 
 
+    var minWidth = 400;
+
+    if (parentWidth < minWidth) {
+        parentWidth = minWidth
+    }
+
     if (0.75 * parentWidth > 0.75 * maxHeight) {
         height = 0.75 * maxHeight;
         width = 1.34 * height;
@@ -32,7 +38,7 @@ function drawPyramid(data, labels, colors, classes, container) {
         , pyramid_h = height
         , cx = width / 2
         , axisFormatter = d3.format('.2s')
-        , labelFormatter=d3.format(',d');
+        , labelFormatter = d3.format(',d');
 
 
     var popRange = (width - gutter - gutter) / 2;
@@ -101,18 +107,18 @@ function drawPyramid(data, labels, colors, classes, container) {
 
 
     // computer X domain
-    var values=[]
+    var values = []
     for (i = 0; i < keys.length; i++) {
         values.push(data[0][keys[i]]);
         values.push(data[1][keys[i]]);
     }
 
-            // find the yscale domin
-            var divider=parseFloat(1.0); 
-            while((Math.max(...values)/divider)>10){
-                divider=divider*10
-            }
-    xDomainVal=Math.ceil(Math.max(...values)/divider)*divider;
+    // find the yscale domin
+    var divider = parseFloat(1.0);
+    while ((Math.max(...values) / divider) > 10) {
+        divider = divider * 10
+    }
+    xDomainVal = Math.ceil(Math.max(...values) / divider) * divider;
 
     var s_male = d3.scaleLinear()
         .domain([0, xDomainVal])
@@ -186,7 +192,7 @@ function drawPyramid(data, labels, colors, classes, container) {
         .enter()
         .append('rect')
         .attr('class', classes[0])
-        .style('fill',colors[0])
+        .style('fill', colors[0])
         .attr('width', d => s_male(parseInt(d)))
         .attr('height', s_age.step() * 0.7)
         .attr('x', cx + gutter)
@@ -200,7 +206,7 @@ function drawPyramid(data, labels, colors, classes, container) {
         .enter()
         .append('rect')
         .attr('class', classes[1])
-        .style('fill',colors[1])
+        .style('fill', colors[1])
         .attr('width', d => s_female(0) - s_female(parseInt(d)))
         .attr('height', s_age.step() * 0.7)
         .attr('x', d => cx - gutter - axisMargin - (s_female(0) - s_female(parseInt(d))))
@@ -229,7 +235,7 @@ function drawPyramid(data, labels, colors, classes, container) {
         .attr('x', d => cx + gutter + s_male(parseInt(d)) + 5)
         .attr('y', (d, i) => s_age(keys[i]) + (s_age.step() * 0.7))
         .style('display', 'none')
-        .attr('class',parentDiv+"mtexts")
+        .attr('class', parentDiv + "mtexts")
         .style('font', '13px sans-serif')
 
 
@@ -241,7 +247,7 @@ function drawPyramid(data, labels, colors, classes, container) {
         .attr('x', d => cx - gutter - axisMargin - (s_female(0) - s_female(parseInt(d))) - 50)
         .attr('y', (d, i) => s_age(keys[i]) + (s_age.step() * 0.7))
         .style('display', 'none')
-        .attr('class',parentDiv+"ftexts")
+        .attr('class', parentDiv + "ftexts")
         .style('font', '13px sans-serif')
 
 
