@@ -135,6 +135,7 @@ svg.append('g')
 
 d3.csv("pop_pyramid.csv")
     .then(function (data) {
+        
 
         //male_values=data[0].slice(1,data[0].length);
         //console.log(data.columns.slice(1,data.columns.length));
@@ -240,6 +241,7 @@ d3.csv("pop_pyramid.csv")
 
 
         function handleMouseOver(d, i) {
+
 
 
             maleBar = d3.select(male_bars.selectAll('rect')._parents[i]).style('fill', 'orangered');

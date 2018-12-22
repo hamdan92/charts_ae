@@ -90,10 +90,10 @@
             <div class="col">
                 <div class="card m-2">
                     <div class="card-header">
-                        Chart
+                        Population Over Time 
                     </div>
 
-                    <div id='lines2' class="align-items-center"></div>
+                    <div id='lines' class="align-items-center"></div>
 
                     <div class="card-footer text-muted">last updated: 2 days ago</div>
                 </div>
@@ -103,9 +103,9 @@
             <div class="col">
                 <div class="card m-2">
                     <div class="card-header">
-                        Chart
+                        Population Growth Over Time (5Y intervals)
                     </div>
-                    <div id='lines'></div>
+                    <div id='lines2'></div>
                     <div class="card-footer text-muted">last updated: 2 days ago</div>
 
                 </div>
@@ -118,9 +118,9 @@
             <div class="col">
                 <div class="card m-2">
                     <div class="card-header">
-                        Chart
+                        Population Pyramid - Local Males vs Local Females
                     </div>
-                    <div id='popGroups'></div>
+                    <div id='pyramid'></div>
                     <div class="card-footer text-muted">last updated: 2 days ago</div>
 
                 </div>
@@ -130,9 +130,9 @@
             <div class="col">
                 <div class="card m-2">
                     <div class="card-header">
-                        Chart
+                        Population Pyramid - Foreign Males vs Foreign Females 
                     </div>
-                    <div id='pyramid'></div>
+                    <div id='npyramid'></div>
                     <div class="card-footer text-muted">last updated: 2 days ago</div>
 
                 </div>
@@ -140,13 +140,55 @@
             </div>
         </div>
 
+        <div class="row">
+                <div class="col">
+                    <div class="card m-2">
+                        <div class="card-header">
+                                Population Pyramid - Locals Vs Foreigns 
+                        </div>
+                        <div id='pyramod'></div>
+                        <div class="card-footer text-muted">last updated: 2 days ago</div>
+    
+                    </div>
+    
+                </div>
+    
+                <div class="col">
+                    <div class="card m-2">
+                        <div class="card-header">
+                            Locals Percentage Over Time
+                        </div>
+                        <div id='vertBar'></div>
+                        <div class="card-footer text-muted">last updated: 2 days ago</div>
+    
+                    </div>
+    
+                </div>
+            </div>
+
+            <div class="row">
+                    <div class="col">
+                        <div class="card m-2">
+                            <div class="card-header">
+                                Population Groups
+                            </div>
+                            <div id='popGroups'></div>
+                            <div class="card-footer text-muted">last updated: 2 days ago</div>
+        
+                        </div>
+        
+                    </div>
+        
+
+                </div>
+
     </div>
 
 
 
     <script src="js/vert_bar.js"></script>
     <script src="js/pop_groups.js"></script>
-    <script src="js/pyramid.js"></script>
+    <script src="js/v2/pyramid.js"></script>
     <script src="js/v2/multi_line.js"></script>
 
     <script>
@@ -229,6 +271,22 @@ d3.csv("data/local_delta.csv").then(function (data1) {
 
 
 });
+
+d3.csv("data/ad_pop_local_nlocal.csv").then(function (data) {
+drawPyramid(data, ['Year','Locals','Foreigns'], ['#3388EE','#EEAACC'], ['male','female'], '#pyramod' )
+});
+
+d3.csv("pop_pyramid.csv").then(function (data) {
+drawPyramid(data, ['Year','Local Males','Local Females'], ['#3388EE','#EEAACC'], ['male','female'], '#pyramid' )
+});
+
+
+d3.csv("data/pyramid_nlocal.csv").then(function (data) {
+drawPyramid(data, ['Year','Foreign Males','Foreign Females'], ['#3388EE','#EEAACC'], ['male','female'], '#npyramid' )
+});
+
+
+
     </script>
 
 

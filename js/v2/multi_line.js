@@ -12,12 +12,18 @@ function drawLines(data_sets,labels, colors, classes,container) {
 
     function drawLineChart(data_sets, keys, container, col1, col2) {
 
-        parentDiv = container;
+        var parentDiv = container;
 
         var maxHeight = screen.height;
         var parentWidth = d3.select(parentDiv).node().getBoundingClientRect().width;
         var height = 0;
         var width = 0
+
+        var minWidth=400;
+
+        if(parentWidth <minWidth) {
+            parentWidth= minWidth
+        }
 
         if (0.75 * parentWidth > 0.75 * maxHeight) {
             height = 0.75 * maxHeight;
@@ -39,6 +45,8 @@ function drawLines(data_sets,labels, colors, classes,container) {
 
 
         // 
+
+        
         values=[]
         for (i=0 ; i<data_sets.length;i++)
         {

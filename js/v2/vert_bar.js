@@ -81,9 +81,9 @@ function drawVertBarChart(data, dataNLocal, dataLocal, dataset) {
         .attr('transform', `translate(${margin.left},${margin.top})`)
 
 
-    svg.append('g').append('text')
-        .attr('transform', d => `translate(${-10},${-10})`)
-        .text('Local Percentage of Total Abu Dhabi Population')
+    //svg.append('g').append('text')
+    //    .attr('transform', d => `translate(${-10},${-10})`)
+    //    .text('Local Percentage of Total Abu Dhabi Population')
 
 
 
