@@ -1,0 +1,466 @@
+// args 
+// data_sets : array of data sets each dataset consists of two coloumns  , each element will represent a line
+//             ex [0:{"year":"1995",population:"5000"} , 1:{...}] the columns must be same for all datasets
+// colors : array of color codes for the lines , size must equal data
+// container : id or class of the container 
+// labels: labels for the for the key (Ex.Year), and each dataset , size = number of datasets  + 1
+// classes : css classes for the lines
+// xAxis_visable: hide or show the x axis (true/false)
+//h2w_ratio=height to width ratio
+// yAxis_side= y axis on left or right
+
+function LineChart(data_sets,labels, colors, classes,container,yAxis_side='left',xAxis_visable=true,h2w_ratio=0.75) {
+
+
+    this.data_sets=data_sets;
+    this.labels=labels;
+    this.colors=colors;
+    this.classes=classes;
+    this.container=container;
+    this.yAxis_side=yAxis_side;
+    this.xAxis_visable=xAxis_visable;
+    this.h2w_ratio=h2w_ratio;
+    this.mouseListeners=[]
+    this.tooltipBox;
+    this.tooltipLine;
+    this.xScale=function(){};
+    
+    
+
+    this.drawLineChart = function (data_sets, keys, container, col1, col2) {
+
+        var parentDiv = container;
+
+        var maxHeight = screen.height;
+        var parentWidth = d3.select(parentDiv).node().getBoundingClientRect().width;
+        
+        this.height = 0;
+        this.width = 0
+
+        var minWidth=400;
+
+        if(parentWidth <minWidth) {
+            parentWidth= minWidth
+        }
+
+        this.width=parentWidth;
+        this.height=this.width*h2w_ratio;
+
+        //console.log('w '+width+' h'+height);
+
+        /*
+        if (h2w_ratio * parentWidth > h2w_ratio * maxHeight) {
+            height = h2w_ratio * maxHeight;
+            width = 1.34 * height;
+
+        }
+       
+
+        else {
+
+            width = parentWidth
+            height = parentWidth;
+
+        }
+ */
+
+        var margin = { top: 30, down: 30, right: 80, left: 40 }
+            ;
+            this. width = this.width - margin.left - margin.right
+          //  , height = (height * h2w_ratio) - margin.top - margin.down;
+          this.height = this.height  - margin.top - margin.down;
+
+
+        // 
+
+        
+        values=[]
+        for (i=0 ; i<this.data_sets.length;i++)
+        {
+         for(j=0;j<this.data_sets[i].length;j++)
+         {
+             values.push(parseFloat(this.data_sets[i][j][this.col2]));
+         }   
+        }
+
+        // find the yscale domin
+        var divider=parseFloat(1.0); 
+        while((Math.max(...values)/divider)>10){
+            divider=divider*10
+        }
+
+        var yDomainVal=Math.ceil(Math.max(...values)/divider)*divider
+
+
+
+        this.xScale=function(){};
+        if(!isNaN(data_sets[0][0][this.col1])) {
+            this.xScale = d3.scaleLinear()
+            .domain([data_sets[0][0][this.col1], data_sets[0][data_sets[0].length - 1][this.col1]])
+            .range([0, this.width]);
+
+        } else  {
+
+            this.xScale = d3.scaleBand()
+            .domain(this.keys[this.col1])
+            .rangeRound([0, this.width]);
+
+        }
+
+        this.yScale=function(){};
+        if (!isNaN(data_sets[0][0][this.col2])){
+        this.yScale = d3.scaleLinear()
+            .domain([0, yDomainVal])
+            .range([this.height, 0]);
+        } else {
+
+            this.yScale = d3.ScaleBand()
+            .domain([0, yDomainVal])
+            .rangeRound([this.height, 0]);
+
+        }
+
+        xScale=this.xScale
+        yScale=this.yScale
+        this.line = d3.line()
+            .x(function (d) { return xScale(d[this.col1]); })
+            .y(function (d) { return yScale(d[this.col2]); })
+            .curve(d3.curveMonotoneX);
+
+
+        this.tooltipBox = d3.select('body').append('div')
+            .style('position', 'absolute')
+            .style('fill', 'lightgray')
+            .style('padding', '5px')
+            .style('display','none')
+            .attr('class','alert alert-info')
+
+            console.log(d3.select(this.tooltipBox.parentNode))
+
+
+
+        var svg = d3.select(parentDiv)//.append('svg')
+            .attr('width', this.width + margin.left + margin.right)
+            .attr('height', this.height + margin.top + margin.down)
+            .append('g')
+            .attr('transform', `translate(${margin.left},${margin.top})`)
+
+        console.log(this.keys[this.col1])            
+
+        
+
+        if(xAxis_visable==true){
+
+            var xAxis=svg.append('g')
+            .attr('class', 'x axis')
+            .attr('transform', `translate(0,${this.height})`)
+
+        if (!isNaN(this.keys[this.col1][0])){
+            xAxis.call(d3.axisBottom(this.xScale)
+            .tickValues(this.keys[this.col1])
+            .tickSize(0)
+            .tickPadding(10)
+           .tickFormat(d3.format(""))
+            );
+        }
+
+        else{
+            ticksVals=[]
+            for (i=4;i<this.keys[this.col1].length+4;i++){
+
+                if(i%4 ==0)
+                {
+                    ticksVals.push(this.keys[this.col1][i-4])
+                }
+            
+
+            }
+            xAxis.call(d3.axisBottom(this.xScale)
+            .tickValues(ticksVals)
+            .tickSize(0)
+            .tickPadding(10)
+     //       .tickFormat(d3.format(""))
+            );
+        }
+    }
+
+        
+
+        var yAxis=svg.append('g')
+            .attr('class', 'y axis')
+            .call(d3.axisLeft(this.yScale)
+                .tickFormat(d3.format(".2s")));
+
+        if(yAxis_side == 'right') {
+            yAxis.attr('transform',`translate(${width},${0})`)
+        }
+
+
+
+        for (i = 0; i<this.data_sets.length; i++) {
+            drawLinePath(svg, data_sets[i], this.line, i)
+        }
+
+
+
+
+
+
+
+
+
+
+        for (i = 0; i<this.data_sets.length; i++) {
+            svg.append('text')
+                .attr('x', this.width + 5)
+                .attr('y', this.yScale(this.data_sets[i][this.data_sets[i].length - 1][this.col2]))
+                .style('fill',colors[i])
+                .html(this.labels[i+1])
+        }
+
+
+
+
+        // Range axis 
+
+
+
+
+
+
+        //var tooltiprect;
+        if (!isNaN(this.keys[this.col1][0])){
+
+
+            this.tooltiprect = svg.append('rect')
+            .attr('height', this.height)
+            .attr('width', this.width)
+            .attr('opacity', 0)
+            
+           // .data([this])
+           .on('mousemove', (d)=>{return this.drawTooltip(d,this)});
+
+        } else {
+
+            //drawTooltip=this.drawTooltip;
+            this.tooltiprect = svg.append('g').selectAll('rect').data(this.keys[this.col1]).enter().append('rect')
+            .attr('height', this.height)
+            .attr('width', this.xScale.step())
+            .attr('transform',(d,i)=>{return `translate(${this.xScale.step()*i},${0})`})
+            .attr('opacity', 0)
+            .attr('label',(d,i)=>{return this.keys[this.col1][i]})
+            .attr('id',(d,i)=>{return this.keys[this.col1][i]})
+            //.data([this])
+            .on('mousemove', (d)=>{return this.drawTooltip(d,this)});
+        }
+
+
+        
+
+        
+
+
+        this.tooltipLine = svg.append('line')
+            .attr('stroke', 'none');
+
+
+
+        
+
+
+
+        
+
+
+    }
+
+
+
+    function drawLinePath(svg, data, line, type) {
+        var className;
+        if (type == 1) className = 'lineNLocal';
+        else if (type == 2) className = 'lineLocal';
+        else className = 'lineTotal';
+
+        svg.append('path')
+            .datum(data)
+            .attr('class', className)
+            .attr('d', line)
+    }
+
+
+
+
+    this.triggerMouse= function (x,time){
+
+        var mTime;
+        var cTime;
+        if (!isNaN(this.keys[this.col1][0])){
+    
+    
+    
+    
+        mTime = Math.floor(this.xScale.invert(x)) + 1;
+    
+        cTime = this.keys[this.col1][0];
+        for (i = 0; i < this.keys[this.col1].length; i++) {
+            if (Math.abs(cTime - mTime) > Math.abs(this.keys[this.col1][i] - mTime)) {
+                cTime = this.keys[this.col1][i];
+            }
+    
+    
+        }
+    }
+    
+    else {
+    
+        cTime=time;
+    
+    }
+    
+    
+    
+    
+        this.tooltipLine.attr('stroke', 'black')
+            .attr('x1', xScale(cTime))
+            .attr('x2', xScale(cTime))
+            .attr('y1', 0)
+            .attr('y2', height);
+    
+    
+    
+        var f2s = d3.format('.2s');
+        var index = this.keys[this.col1].indexOf(cTime);
+        console.log("x: " + d3.event.pageX + "y: " + d3.event.pageY);
+    
+        this.tooltipBox.selectAll('*').remove();
+        this.tooltipBoxText=this.labels[0]+" : " + cTime + " <br/>";
+        for(i=0 ;i<this.data_sets.length;i++)
+        {
+            tooltipBoxText +=this.labels[i+1]+": "+f2s(this.data_sets[i][index][this.col2])+"<br/>";
+    
+        }
+        tooltipBox
+        .attr('transform',`translate(${ d3.mouse(this)[0] - 34},${ d3.mouse(this)[1] - 12})`)
+        d3.mouse(document.body)
+    
+        tooltipBox
+            .style('display', 'inline')
+            .style('left', d3.mouse(document.body)[0] - 100)
+            .style('top', height/2 - 100)
+            .html(tooltipBoxText)
+    
+    }
+    
+    
+
+
+
+
+    //Line Chart
+
+
+
+
+
+
+
+
+    this.col1 = data_sets[0].columns[0];
+    this.col2 = data_sets[0].columns[1]
+    this.keys={}
+    this.keys[this.col1] = [];
+    this.keys[this.col2] = [];
+    for (i = 0; i < this.data_sets[0].length; i++) {
+        this.keys[this.col1].push(this.data_sets[0][i][this.col1])
+        this.keys[this.col2].push(this.data_sets[0][i][this.col2])
+
+    }
+
+    this.drawLineChart(this.data_sets, this.keys, this.container, this.col1, this.col2)
+
+
+    this.drawTooltip= function(d,lineChart) {
+        
+        for(i=0;i<this.mouseListeners.length;i++)
+        {
+            this.mouseListeners[i]();
+        }
+        var mTime;
+        var cTime;
+        if (!isNaN(this.keys[this.col1][0])){
+    
+    
+    
+    
+        mTime = Math.floor(this.xScale.invert(d3.mouse(d3.select(`[id="${d}"]`))[0])) + 1;
+    
+        cTime = this.keys[this.col1][0];
+        for (i = 0; i < this.keys[this.col1].length; i++) {
+            if (Math.abs(cTime - mTime) > Math.abs(this.keys[this.col1][i] - mTime)) {
+                cTime = this.keys[this.col1][i];
+            }
+    
+    
+        }
+    }
+    
+    else {
+    
+        console.log(d3.select(`[id="${d}"]`).attr('label'))
+        cTime=d3.select(`[id="${d}"]`).attr('label');
+    
+    }
+    
+    
+    
+    
+        this.tooltipLine.attr('stroke', 'black')
+            .attr('x1', this.xScale(cTime))
+            .attr('x2', this.xScale(cTime))
+            .attr('y1', 0)
+            .attr('y2', this.height);
+    
+    
+    
+        var f2s = d3.format('.2s');
+        var index = this.keys[this.col1].indexOf(cTime);
+        console.log("x: " + d3.event.pageX + "y: " + d3.event.pageY);
+    
+        this.tooltipBox.selectAll('*').remove();
+        this.tooltipBoxText=this.labels[0]+" : " + cTime + " <br/>";
+        for(i=0 ;i<this.data_sets.length;i++)
+        {
+            console.log(i)
+            console.log(index)
+            console.log(this.labels)
+            console.log(this.data_sets.length)
+            this.tooltipBoxText +=this.labels[i+1]+": "+f2s(this.data_sets[i][index][this.col2])+"<br/>";
+    
+        }
+    
+        this.tooltipBox
+            .style('display', 'inline')
+            .style('left', d3.mouse(document.body)[0] - 100)
+            .style('top', d3.mouse(document.body)[1] - 100)
+            .html(this.tooltipBoxText)
+    
+    }
+
+
+
+
+
+
+
+}
+
+
+LineChart.prototype.addMouseLisitner=function(listener){
+
+    this.mouseListeners.push(listener)
+    console.log(this.mouseListeners)
+    
+
+}
+

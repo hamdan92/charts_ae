@@ -1,0 +1,187 @@
+<!DOCTYPE <!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Charts.ae - Abu Dhabi Population</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" media="screen" href="css/style.css" />
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+        crossorigin="anonymous">
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+
+
+    <style type="text/css">
+        body {
+            background: #ededed !important;
+        }
+
+        img.icon {
+
+            width: 4%;
+            height: auto;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+            <a class="navbar-brand" href="#">Charts | بيانيات</a>
+        </nav>
+
+        <div class="row m-2 bg-white">
+            <div class="col ">
+                <h1 class="display-4">Abu Dhabi Population</h1>
+                <p>Source: <a href="https://scad.gov.abudhabi"> Statistics Centre</a></p>
+            </div>
+        </div>
+        <div class="row container">
+            <div class='alert col m-2 alert-primary'>
+                
+                    <h4 class="alert-heading text-center">Super 98</h4>
+    
+                    <p class='text-center lead'>2.3 AED/L</p>
+
+
+            </div>
+            <div class='alert col m-2 alert-success'>
+                    <h4 class="alert-heading text-center">Special 95</h4>
+
+
+                    <p class='text-center lead'>2.0 AED/L</p>
+ 
+
+            </div>
+            <div class='alert col m-2 alert-danger'>
+                    <h4 class="alert-heading text-center">E Plus 91</h4>
+
+
+                    <p class='text-center lead'>55 AED/L</p>
+
+
+            </div>
+            <div class='alert col m-2 alert-warning'>
+                    <h4 class="alert-heading text-center">Diesel</h4>
+
+
+                    <p class='text-center lead'>55 AED/L</p>
+ 
+
+            </div>
+
+
+
+
+
+        </div>
+        <div class='row'>
+            <div class="col">
+                <div class="card m-2">
+                    <div class="card-header">
+                        Population Growth Over Time (5Y intervals)
+                    </div>
+
+                    <svg id='lines2'></svg>
+                    <svg id='lines3'></svg>
+                    <p class='text-muted'> <img class='icon' src="icons/baseline_touch_app_black_18dp.png"> <small>This
+                            chart is interactive, use mouse or touch to interact</small></p>
+                    <div class="card-footer text-muted">last updated: Monday, December 31, 2018</div>
+
+                </div>
+
+            </div>
+            <div class='col'></div>
+        </div>
+
+
+    </div>
+
+
+
+    <script src="js/v2/multi_line.js"></script>
+
+    <script>
+        var l1;
+        var l2;
+
+
+
+
+        d3.csv("data/oil/98.csv").then(function (data) {
+
+
+
+            var dataTotal = data;
+            var dataLocal;
+            var dataNLocal;
+
+
+
+            d3.csv("data/oil/95.csv").then(function (data1) {
+                dataLocal = data1;
+
+                d3.csv("data/oil/91.csv").then(function (data2) {
+                    dataNLocal = data2;
+
+                    var data_sets = []
+                    data_sets.push(data)
+                    data_sets.push(dataLocal)
+                    data_sets.push(dataNLocal)
+
+
+
+                    d3.csv("data/oil/wti.csv").then(function (data) {
+
+                        var d1 = []
+                        d1.push(data)
+                        l2 = new LineChart(d1, ['Date', 'WTI'], ['ffab00'], [], '#lines2', 'left', false, 0.4,'.0f','.2f')
+                        l1 = new LineChart(data_sets, ['Date', '98', '95', '91'], ['ffab00', 'orangered', 'green'], [], '#lines3', 'left', true, 0.4,'.1f','.2f')
+
+                        var lis1 = function (time) {
+                            l2.triggerMouse(d3.mouse(document.body)[0], time)
+                        }
+                        var lis2 = function (time) {
+                            l1.triggerMouse(d3.mouse(document.body)[0], time)
+                        }
+                        l1.addListener(lis1);
+                        l2.addListener(lis2);
+
+
+                    });
+
+
+
+
+
+
+                });
+
+
+            });
+
+
+
+
+
+        });
+
+
+
+
+    </script>
+
+
+</body>
+
+</html>

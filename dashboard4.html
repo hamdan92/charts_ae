@@ -4,10 +4,12 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Charts.ae - Abu Dhabi Population</title>
+    <title>Charts.ae</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="shortcut icon" type="image/png" href="icons/favicon.ico"/>
+
     <link rel="stylesheet" type="text/css" media="screen" href="css/style.css" />
-    <script src="https://d3js.org/d3.v5.min.js"></script>
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
         crossorigin="anonymous">
@@ -27,81 +29,43 @@
 
         img.icon {
             
-            width: 4%;
+            width: 10%;
             height:auto;
         }
 
-        /* Adding !important forces the browser to overwrite the default style applied by Bootstrap */
 
-        /*#vertBar {
+        .card{
+            height: 250px;
+        }
 
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    height: 500px;
-    width: 500px;
-
-    }
-
-    #lines {
-
-    position: absolute;
-    top: 10px;
-    left: 510;
-    height: 500px;
-    width: 500px;
-
-
-
-    }
-
-    #popGroups {
-
-    position: absolute;
-    top: 510px;
-    left: 10px;
-    height: 500px;
-    width: 500px;
-
-
-    }
-
-    #pyramid {
-
-    position: absolute;
-    top: 510px;
-    left: 510px;
-    height: 500px;
-    width: 500px;
-
-
-    }*/
+   
     </style>
 </head>
 
 <body>
 
     <div class="container">
-        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <a class="navbar-brand" href="#">Charts | بيانيات</a>
         </nav>
 
-        <div class="row m-2 bg-white">
-            <div class="col ">
-                <h1 class="display-4">Abu Dhabi Population</h1>
-                <p>Source: <a href="https://scad.gov.abudhabi"> Statistics Centre</a></p>
-            </div>
+        <div class="jumbotron  bg-white">
+                <h1 class="display-4">UAE Data to Visualizations</h1>
+                <p class="lead">Welcome to Charts.ae, a non profit project aims to collect data and turn them to meaningful visualizations </p>
         </div>
         <div class="row">
             <div class="col">
                 <div class="card m-2">
                     <div class="card-header">
-                        Population Over Time
+                        Population
                     </div>
-                    <svg id='lines' class="align-items-center"></svg>
-                    <p class='text-muted'> <img class='icon' src="icons/baseline_touch_app_black_18dp.png"> <small>This chart is interactive, use mouse or touch to interact</small></p>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><a href='dashboard3.html'>Abu Dhabi Population</a></li>
+                        <li class="list-group-item"><a href=''>Abu Dhabi Population</a></li>
 
-                    <div class="card-footer text-muted">last updated: Monday, December 31, 2018</div>
+
+                      </ul>
+
                 </div>
 
             </div>
@@ -109,9 +73,9 @@
             <div class="col">
                 <div class="card m-2">
                     <div class="card-header">
-                        Population Growth Over Time (5Y intervals)
+                        Economy & Energy
                     </div>
-                    <svg id='lines2'></svg>
+                    <div id='lines2'></div>
                     <p class='text-muted'> <img class='icon' src="icons/baseline_touch_app_black_18dp.png"> <small>This chart is interactive, use mouse or touch to interact</small></p>
                     <div class="card-footer text-muted">last updated: Monday, December 31, 2018</div>
 
@@ -125,7 +89,7 @@
             <div class="col">
                 <div class="card m-2">
                     <div class="card-header">
-                        Population Pyramid - Local Males vs Local Females
+                        Environment & Climate
                     </div>
                     <div id='pyramid'></div>
                     <p class='text-muted'> <img class='icon' src="icons/baseline_touch_app_black_18dp.png"> <small>This chart is interactive, use mouse or touch to interact</small></p>
@@ -138,11 +102,8 @@
             <div class="col">
                 <div class="card m-2">
                     <div class="card-header">
-                        Population Pyramid - Foreign Males vs Foreign Females
+                        Health & Education
                     </div>
-                    <div id='npyramid'></div>
-                    <p class='text-muted'> <img class='icon' src="icons/baseline_touch_app_black_18dp.png"> <small>This chart is interactive, use mouse or touch to interact</small></p>
-                    <div class="card-footer text-muted">last updated: Monday, December 31, 2018</div>
 
                 </div>
 
@@ -153,11 +114,8 @@
             <div class="col">
                 <div class="card m-2">
                     <div class="card-header">
-                        Population Pyramid - Locals Vs Foreigns
+                        Culture, Langauge & Social Media
                     </div>
-                    <div id='pyramod'></div>
-                    <p class='text-muted'> <img class='icon' src="icons/baseline_touch_app_black_18dp.png"> <small>This chart is interactive, use mouse or touch to interact</small></p>
-                    <div class="card-footer text-muted">last updated: Monday, December 31, 2018</div>
 
                 </div>
 
@@ -220,7 +178,7 @@
                 d3.csv("data/ad_nlocal_pop.csv").then(function (data2) {
                     dataNLocal = data2;
 
-                    var data_sets = []
+                    data_sets = []
                     data_sets.push(data)
                     data_sets.push(dataNLocal)
                     data_sets.push(dataLocal)
@@ -228,7 +186,7 @@
 
 
 
-                    new LineChart(data_sets, ['Year', 'Total', 'NLocal', 'Local'], ['ffab00', 'orangered', 'green'], [], '#lines')
+                    drawLines(data_sets, ['Year', 'Total', 'NLocal', 'Local'], ['ffab00', 'orangered', 'green'], [], '#lines')
 
 
 
@@ -269,7 +227,7 @@
 
 
 
-                    new LineChart(data_sets, ['Year', 'Total', 'NLocal', 'Local'], ['ffab00', 'orangered', 'green'], [], '#lines2')
+                    drawLines(data_sets, ['Year', 'Total', 'NLocal', 'Local'], ['ffab00', 'orangered', 'green'], [], '#lines2')
 
 
 

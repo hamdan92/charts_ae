@@ -5,9 +5,21 @@
 // container : id or class of the container 
 // labels: labels for the for the key (Ex.Year), and each dataset , size = number of datasets  + 1
 // classes : css classes for the lines
+// xAxis_visable: hide or show the x axis (true/false)
+//h2w_ratio=height to width ratio
+// yAxis_side= y axis on left or right
 
-function drawLines(data_sets,labels, colors, classes,container) {
+function LineChart (data_sets,labels, colors, classes,container,yAxis_side='left',xAxis_visable=true,h2w_ratio=0.75,yAxis_tick_format='.2s',tooltip_format='.2s') {
 
+    var svg;
+    var tooltipLine;
+    var tooltipBox;
+    var xScale;
+    var yScale;
+    var height;
+    var width;
+    var listeners=[]
+    var margin;
 
 
     function drawLineChart(data_sets, keys, container, col1, col2) {
@@ -16,8 +28,9 @@ function drawLines(data_sets,labels, colors, classes,container) {
 
         var maxHeight = screen.height;
         var parentWidth = d3.select(parentDiv).node().getBoundingClientRect().width;
-        var height = 0;
-        var width = 0
+        
+        height = 0;
+        width = 0;
 
         var minWidth=400;
 
@@ -25,11 +38,18 @@ function drawLines(data_sets,labels, colors, classes,container) {
             parentWidth= minWidth
         }
 
-        if (0.75 * parentWidth > 0.75 * maxHeight) {
-            height = 0.75 * maxHeight;
+        width=parentWidth;
+        height=width*h2w_ratio;
+
+        //console.log('w '+width+' h'+height);
+
+        /*
+        if (h2w_ratio * parentWidth > h2w_ratio * maxHeight) {
+            height = h2w_ratio * maxHeight;
             width = 1.34 * height;
 
         }
+       
 
         else {
 
@@ -37,11 +57,12 @@ function drawLines(data_sets,labels, colors, classes,container) {
             height = parentWidth;
 
         }
+ */
 
-
-        var margin = { top: 30, down: 30, right: 80, left: 40 }
+         margin = { top: 30, down: 30, right: 80, left: 40 }
             , width = width - margin.left - margin.right
-            , height = (height * 0.75) - margin.top - margin.down;
+          //  , height = (height * h2w_ratio) - margin.top - margin.down;
+          , height = height  - margin.top - margin.down;
 
 
         // 
@@ -66,17 +87,30 @@ function drawLines(data_sets,labels, colors, classes,container) {
 
 
 
-
-
-        var xScale = d3.scaleLinear()
+        if(!isNaN(data_sets[0][0][col1])) {
+            xScale = d3.scaleLinear()
             .domain([data_sets[0][0][col1], data_sets[0][data_sets[0].length - 1][col1]])
             .range([0, width]);
 
+        } else  {
 
-        var yScale = d3.scaleLinear()
+            xScale = d3.scaleBand()
+            .domain(keys[col1])
+            .rangeRound([0, width]);
+
+        }
+
+        if (!isNaN(data_sets[0][0][col2])){
+        yScale = d3.scaleLinear()
             .domain([0, yDomainVal])
             .range([height, 0]);
+        } else {
 
+            yScale = d3.ScaleBand()
+            .domain([0, yDomainVal])
+            .rangeRound([height, 0]);
+
+        }
 
         var line = d3.line()
             .x(function (d) { return xScale(d[col1]); })
@@ -84,31 +118,72 @@ function drawLines(data_sets,labels, colors, classes,container) {
             .curve(d3.curveMonotoneX);
 
 
-        var tooltipBox = d3.select(parentDiv).append('div')
+        tooltipBox = d3.select('body').append('div')
             .style('position', 'absolute')
-            .style('background', 'lightgray')
+            .style('fill', 'lightgray')
             .style('padding', '5px')
+            .style('display','none')
+            .attr('class','alert alert-info')
+
+            console.log(d3.select(tooltipBox.parentNode))
 
 
-        var svg = d3.select(parentDiv).append('svg')
+
+        svg = d3.select(parentDiv)//.append('svg')
             .attr('width', width + margin.left + margin.right)
             .attr('height', height + margin.top + margin.down)
             .append('g')
             .attr('transform', `translate(${margin.left},${margin.top})`)
 
-        svg.append('g')
+        console.log(keys[col1])            
+
+        
+
+        if(xAxis_visable==true){
+
+            var xAxis=svg.append('g')
             .attr('class', 'x axis')
             .attr('transform', `translate(0,${height})`)
-            .call(d3.axisBottom(xScale)
-                .tickValues(keys[col1])
-                .tickSize(0)
-                .tickPadding(10)
-                .tickFormat(d3.format("")));
 
-        svg.append('g')
+        if (!isNaN(keys[col1][0])){
+            xAxis.call(d3.axisBottom(xScale)
+            .tickValues(keys[col1])
+            .tickSize(0)
+            .tickPadding(10)
+           .tickFormat(d3.format(""))
+            );
+        }
+
+        else{
+            ticksVals=[]
+            for (i=4;i<keys[col1].length+4;i++){
+
+                if(i%4 ==0)
+                {
+                    ticksVals.push(keys[col1][i-4])
+                }
+            
+
+            }
+            xAxis.call(d3.axisBottom(xScale)
+            .tickValues(ticksVals)
+            .tickSize(0)
+            .tickPadding(10)
+     //       .tickFormat(d3.format(""))
+            );
+        }
+    }
+
+        
+
+        var yAxis=svg.append('g')
             .attr('class', 'y axis')
             .call(d3.axisLeft(yScale)
-                .tickFormat(d3.format(".2s")));
+                .tickFormat(d3.format(yAxis_tick_format)));
+
+        if(yAxis_side == 'right') {
+            yAxis.attr('transform',`translate(${width},${0})`)
+        }
 
 
 
@@ -143,17 +218,32 @@ function drawLines(data_sets,labels, colors, classes,container) {
 
 
 
+        var tooltiprect;
+        if (!isNaN(keys[col1][0])){
 
-
-
-        var tooltiprect = svg.append('rect')
+            tooltiprect = svg.append('rect')
             .attr('height', height)
             .attr('width', width)
             .attr('opacity', 0)
             .on('mousemove', drawTooltip);
 
+        } else {
+            tooltiprect = svg.append('g').selectAll('rect').data(keys[col1]).enter().append('rect')
+            .attr('height', height)
+            .attr('width', xScale.step())
+            .attr('transform',(d,i)=>{return `translate(${xScale.step()*i},${0})`})
+            .attr('opacity', 0)
+            .attr('label',(d,i)=>{return keys[col1][i]})
+            .on('mousemove', drawTooltip);
+        }
 
-        var tooltipLine = svg.append('line')
+
+        
+
+        
+
+
+        tooltipLine = svg.append('line')
             .attr('stroke', 'none');
 
 
@@ -161,46 +251,73 @@ function drawLines(data_sets,labels, colors, classes,container) {
 
         function drawTooltip() {
 
+ 
+
+            var mTime;
+            var cTime;
+            if (!isNaN(keys[col1][0])){
 
 
-            mYear = Math.floor(xScale.invert(d3.mouse(this)[0])) + 1;
 
-            cYear = keys[col1][0];
+
+            mTime = Math.floor(xScale.invert(d3.mouse(this)[0])) + 1;
+
+            cTime = keys[col1][0];
             for (i = 0; i < keys[col1].length; i++) {
-                if (Math.abs(cYear - mYear) > Math.abs(keys[col1][i] - mYear)) {
-                    cYear = keys[col1][i];
+                if (Math.abs(cTime - mTime) > Math.abs(keys[col1][i] - mTime)) {
+                    cTime = keys[col1][i];
                 }
 
 
             }
+        }
+
+        else {
+
+            console.log(d3.select(this).attr('label'))
+            cTime=d3.select(this).attr('label');
+
+        }
 
 
+        for (i=0;i<listeners.length;i++){
+            listeners[i](cTime);
+        }
 
 
             tooltipLine.attr('stroke', 'black')
-                .attr('x1', xScale(cYear))
-                .attr('x2', xScale(cYear))
+                .attr('x1', xScale(cTime))
+                .attr('x2', xScale(cTime))
                 .attr('y1', 0)
                 .attr('y2', height);
 
 
 
-            var f2s = d3.format('.2s');
-            var index = keys[col1].indexOf(cYear);
-            console.log("x: " + d3.event.pageX + "y: " + d3.event.pageY);
+            var f2s = d3.format(tooltip_format);
+            var index = keys[col1].indexOf(cTime);
+            //console.log("x: " + d3.event.pageX + "y: " + d3.event.pageY);
 
-            tooltipBoxText=labels[0]+" : " + cYear + " <br/>";
+            tooltipBox.selectAll('*').remove();
+            tooltipBoxText=labels[0]+" : " + cTime + " <br/>";
             for(i=0 ;i<data_sets.length;i++)
             {
                 tooltipBoxText +=labels[i+1]+": "+f2s(data_sets[i][index][col2])+"<br/>";
 
             }
             tooltipBox
+            . attr('transform',`translate(${ d3.mouse(this)[0] - 34},${ d3.mouse(this)[1] - 12})`)
+            d3.mouse(document.body)
+
+            tooltipBox
                 .style('display', 'inline')
+                .style('left', d3.mouse(document.body)[0] - 120)
+                .style('top', d3.mouse(document.body)[1] - 100)
                 .html(tooltipBoxText)
-                .style('left', d3.mouse(this)[0] - 34)
-                .style('top', d3.mouse(this)[1] - 12)
+
         }
+
+
+        
 
 
     }
@@ -216,7 +333,6 @@ function drawLines(data_sets,labels, colors, classes,container) {
             .attr('class', className)
             .attr('d', line)
     }
-
 
 
 
@@ -254,6 +370,50 @@ function drawLines(data_sets,labels, colors, classes,container) {
 
 
 
+this.triggerMouse=function(x,time){
+        console.log('m triggered')
+        var cTime=time
 
+        var p_h = d3.select(container).node().getBoundingClientRect().height+d3.select(container).node().getBoundingClientRect().y;
+    
+
+
+        console.log(margin.down)
+        tooltipLine.attr('stroke', 'black')
+            .attr('x1', xScale(cTime))
+            .attr('x2', xScale(cTime))
+            .attr('y2', 0)
+            .attr('y1', p_h-margin.down-margin.top-d3.select(container).node().getBoundingClientRect().y)
+
+
+
+        var f2s = d3.format(tooltip_format);
+        var index = keys[col1].indexOf(cTime);
+
+        tooltipBox.selectAll('*').remove();
+        tooltipBoxText=labels[0]+" : " + cTime + " <br/>";
+        for(i=0 ;i<data_sets.length;i++)
+        {
+            tooltipBoxText +=labels[i+1]+": "+f2s(data_sets[i][index][col2])+"<br/>";
+
+        }
+        //tooltipBox
+        //.attr('transform',`translate(${x},${ height/2})`)
+       // d3.mouse(document.body)
+        
+       //console.log(svg.attr('height'))
+
+        tooltipBox
+            .style('display', 'inline')
+            .style('left', x-120)
+            .style('top', p_h )
+            .html(tooltipBoxText)
+
+}
+
+this.addListener=function(l){
+    console.log('l added')
+    listeners.push(l)
+}
 
 }
